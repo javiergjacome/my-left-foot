@@ -59,6 +59,31 @@
   padding: 2px 6px;
 }
 
+/* --- Mobile fixes --- */
+@media (max-width: 600px) {
+
+  /* 1) Make chapter text bigger (keep glossary as-is) */
+  /* Affects normal paragraphs in sections, but NOT glossary definitions */
+  section.page p {
+    font-size: 1.08rem;
+    line-height: 1.75;
+  }
+
+  /* 2) Glossary: use full width and stack definition under the term */
+  #glossary dl {
+    display: block;          /* override grid */
+  }
+
+  #glossary dt {
+    margin-top: 12px;
+  }
+
+  #glossary dd {
+    margin: 4px 0 0 0;       /* definition right after the term */
+  }
+}
+
+
   </style>
 </head>
 <body>
