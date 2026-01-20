@@ -52,6 +52,13 @@
   background: #555;
 }
 
+/* Highlight for matched glossary term */
+#glossary dt.glossary-hit {
+  background: #fff3b0;
+  border-radius: 8px;
+  padding: 2px 6px;
+}
+
   </style>
 </head>
 <body>
@@ -261,23 +268,89 @@
 
 <script>
   let lastPosition = null;
+  let isGlossaryMode = false; // false = 📘 (ir), true = ⬅️ (volver)
 
   const glossaryBtn = document.getElementById("glossaryBtn");
   const glossarySection = document.getElementById("glossary");
 
-  glossaryBtn.addEventListener("click", () => {
-    const glossaryTop = glossarySection.getBoundingClientRect().top;
+  function normalizeTerm(s) {
+    return (s || "")
+      .toLowerCase()
+      .trim()
+      .replace(/[“”"'.:,;!?()]/g, "")
+      .replace(/\s+/g, " ");
+  }
 
-    // If glossary is NOT visible → go to glossary
-    if (Math.abs(glossaryTop) > 100) {
-      lastPosition = window.scrollY;
-      glossarySection.scrollIntoView({ behavior: "smooth" });
-      glossaryBtn.textContent = "⬅️";
-    } 
-    // If glossary IS visible → go back
-    else if (lastPosition !== null) {
+  function clearHits() {
+    document.querySelectorAll("#glossary dt.glossary-hit")
+      .forEach(el => el.classList.remove("glossary-hit"));
+  }
+
+  function getSelectedWord() {
+    const sel = window.getSelection();
+    if (!sel || sel.isCollapsed) return "";
+    return sel.toString().trim();
+  }
+
+  function findGlossaryMatch(query) {
+    const q = normalizeTerm(query);
+    if (!q) return null;
+
+    const dts = Array.from(document.querySelectorAll("#glossary dt"));
+
+    // exacta
+    let hit = dts.find(dt => normalizeTerm(dt.textContent) === q);
+    if (hit) return hit;
+
+    // empieza por
+    hit = dts.find(dt => normalizeTerm(dt.textContent).startsWith(q));
+    if (hit) return hit;
+
+    // contiene
+    hit = dts.find(dt => normalizeTerm(dt.textContent).includes(q));
+    return hit || null;
+  }
+
+  function goToGlossary() {
+    lastPosition = window.scrollY;
+    glossarySection.scrollIntoView({ behavior: "smooth" });
+    glossaryBtn.textContent = "⬅️";
+    isGlossaryMode = true;
+  }
+
+  function goBack() {
+    clearHits();
+    if (lastPosition !== null) {
       window.scrollTo({ top: lastPosition, behavior: "smooth" });
-      glossaryBtn.textContent = "📘";
+    }
+    glossaryBtn.textContent = "📘";
+    isGlossaryMode = false;
+  }
+
+  glossaryBtn.addEventListener("click", () => {
+    const selected = getSelectedWord();
+
+    // 1) Si hay selección: siempre ir al glosario y buscar (sin alternar a "ir")
+    if (selected) {
+      goToGlossary();
+
+      setTimeout(() => {
+        clearHits();
+        const match = findGlossaryMatch(selected);
+        if (match) {
+          match.classList.add("glossary-hit");
+          match.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+      }, 250);
+
+      return;
+    }
+
+    // 2) Si NO hay selección: TOGGLE puro
+    if (!isGlossaryMode) {
+      goToGlossary();
+    } else {
+      goBack();
     }
   });
 </script>
