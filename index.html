@@ -60,6 +60,30 @@
 }
 
 
+/* Botón flotante del TOC */
+#tocBtn {
+  position: fixed;
+  bottom: 84px;         /* ← encima del botón de glosario */
+  right: 20px;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: none;
+  background: #333;
+  color: #fff;
+  font-size: 22px;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  z-index: 1000;
+}
+#tocBtn:hover { background: #555; }
+
+/* Si prefieres alinearlos en horizontal (uno al lado del otro), comenta lo de arriba y usa esto:
+#tocBtn { bottom: 20px; right: 84px; }
+*/
+
+
+
 /* ----- Índice (TOC) ----- */
 #toc {
   background: #fff;
@@ -88,16 +112,25 @@
 #toc a:hover {
   text-decoration: underline;
 }
-/* Estado activo (capítulo visible) */
-#toc a.active {
-  color: #0a3f8f;
-  font-weight: 600;
-  position: relative;
+
+/* Estilo de la tira de páginas del TOC */
+#toc .toc-pages {
+  margin-left: .35rem;
+  color: #333;
+  font-size: .95rem;
+  white-space: nowrap;
 }
-#toc a.active::before {
-  content: "•";
-  color: #0a3f8f;
-  margin-right: 6px;
+#toc .toc-pages a {
+  margin-left: .4rem;
+  color: #0b5bd3;
+  text-decoration: none;
+}
+#toc .toc-pages a:hover { text-decoration: underline; }
+
+/* En pantallas estrechas, permitir salto de línea si no cabe */
+@media (max-width: 520px) {
+  #toc .toc-pages { white-space: normal; display: block; margin: .35rem 0 0 0; }
+  #toc .toc-pages a { margin-left: 0.45rem; }
 }
 
 /* Contenedor del capítulo (decorativo) */
@@ -142,7 +175,6 @@
     <header>
       <h1>My Left Foot</h1>
       <p class="meta">by Christy Brown</p>
-      <h2>CHAPTER 1 — THE LETTER “A”</h2>
 		<nav id="toc">
 		  <h2>Índice</h2>
 		  <ol id="toc-list"></ol>
@@ -427,6 +459,12 @@
   📘
 </button>
 
+<!-- Floating TOC button -->
+<button id="tocBtn" title="Ir al índice / Volver" aria-label="Ir al índice">
+  ☰
+</button>
+
+
 
 <script>
   // --- Estado por capítulo ---
@@ -546,7 +584,7 @@
         const match = findGlossaryMatch(selected, glossary);
         if (match) {
           match.classList.add("glossary-hit");
-          match.scrollIntoView({ behavior: "smooth", block: "center" });
+          match.scrollIntoView({ behavior: "auto", block: "center" });
         }
       }, 250);
       return;
@@ -562,82 +600,293 @@
 </script>
 
 <script>
-  // Construye el índice automáticamente y activa resaltado por scroll (scroll-spy)
+  // Índice automático con "tira" de páginas por capítulo (sin scroll-spy)
   document.addEventListener("DOMContentLoaded", () => {
     const tocList = document.getElementById("toc-list");
     if (!tocList) return;
 
-    // 1) Recolectar capítulos
     const chapters = Array.from(document.querySelectorAll("article.chapter"));
-    const items = [];
+
+    // Utilidad: obtener etiqueta de página ("13") a partir del <div.pagenum> o del id="page-13"
+    function getPageLabel(pageSection) {
+      const pn = pageSection.querySelector(".pagenum");
+      if (pn) {
+        const m = pn.textContent.match(/\d+/);
+        if (m) return m[0];
+      }
+      const m2 = (pageSection.id || "").match(/\d+/);
+      return m2 ? m2[0] : pageSection.id || "§";
+    }
 
     chapters.forEach((chapter) => {
       const id = chapter.id || "";
       const titleEl = chapter.querySelector(".chapter-title");
-      const title = titleEl ? titleEl.textContent.trim() : id || "Capítulo";
+      const title = titleEl ? titleEl.textContent.trim() : (id || "Capítulo");
 
-      // Crear <li><a href="#cap-x">Título…</a></li>
+      // <li>
       const li = document.createElement("li");
-      const a = document.createElement("a");
-      a.href = `#${id}`;
-      a.textContent = title;
 
-      // Scroll suave al hacer clic
-      a.addEventListener("click", (ev) => {
+      // Enlace al capítulo
+      const aChapter = document.createElement("a");
+      aChapter.href = `#${id}`;
+      aChapter.textContent = title;
+
+      aChapter.addEventListener("click", (ev) => {
         ev.preventDefault();
-        chapter.scrollIntoView({ behavior: "smooth", block: "start" });
-        // actualizar hash sin salto brusco
+        chapter.scrollIntoView({ behavior: "auto", block: "start" });
         history.pushState(null, "", `#${id}`);
       });
 
-      li.appendChild(a);
-      tocList.appendChild(li);
-      items.push({ chapter, a });
-    });
+      li.appendChild(aChapter);
 
-    // 2) Resaltado del capítulo visible usando IntersectionObserver
-    const observer = new IntersectionObserver((entries) => {
-      // buscamos el capítulo con mayor intersección
-      let best = null;
-      let bestRatio = 0;
+      // " : 13 14 15 ..." -> contenedor
+      const pagesWrap = document.createElement("span");
+      pagesWrap.className = "toc-pages";
+      pagesWrap.append(document.createTextNode(":"));
 
-      entries.forEach((entry) => {
-        if (entry.isIntersecting && entry.intersectionRatio > bestRatio) {
-          best = entry.target;
-          bestRatio = entry.intersectionRatio;
-        }
+      // Recolectar páginas del capítulo
+      const pages = Array.from(chapter.querySelectorAll("section.page[id]"));
+      pages.forEach((sec) => {
+        const pageId = sec.id;
+        const label = getPageLabel(sec);
+
+        const link = document.createElement("a");
+        link.href = `#${pageId}`;
+        link.textContent = label;
+
+        // Guardamos el capítulo "dueño" en un data-atributo (útil para persistencia)
+        link.dataset.chapterId = id;
+
+        link.addEventListener("click", (ev) => {
+          ev.preventDefault();
+          sec.scrollIntoView({ behavior: "auto", block: "start" });
+          history.pushState(null, "", `#${pageId}`);
+        });
+
+        pagesWrap.appendChild(link);
       });
 
-      if (best) {
-        // limpiar activos
-        items.forEach(({ a }) => a.classList.remove("active"));
-        // marcar activo
-        const found = items.find(({ chapter }) => chapter === best);
-        if (found) found.a.classList.add("active");
-      }
-    }, {
-      root: null,
-      // Consideramos visible “de verdad” cuando ~40% del capítulo está a la vista
-      threshold: [0.4, 0.6, 0.8]
+      li.appendChild(pagesWrap);
+      tocList.appendChild(li);
     });
-
-    chapters.forEach(ch => observer.observe(ch));
-
-    // 3) Si llegamos con hash en URL (#cap-x), activar ese activo de inicio
-    if (location.hash) {
-      const target = document.querySelector(location.hash);
-      if (target && target.classList.contains("chapter")) {
-        // Marcarlo “a mano” al principio
-        items.forEach(({ a }) => {
-          a.classList.toggle("active", a.getAttribute("href") === location.hash);
-        });
-        // Opcional: scroll suave si quieres
-        // target.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
-    }
   });
 </script>
 
+
+<script>
+(function () {
+  const LS = {
+    chapter: 'mlf:lastChapterId',
+    page: 'mlf:lastPageId'
+  };
+
+  // --- Helpers reutilizando tu lógica existente si está disponible ---
+  function getCurrentChapterEl() {
+    // Usa la función global si la define el script de glosario
+    if (typeof getCurrentChapter === 'function') return getCurrentChapter();
+
+    // Fallback por si cambias el orden de scripts
+    const chapters = Array.from(document.querySelectorAll('article.chapter'));
+    if (!chapters.length) return null;
+    const midY = window.scrollY + window.innerHeight / 2;
+
+    let current = chapters.find(ch => {
+      const rect = ch.getBoundingClientRect();
+      const top = rect.top + window.scrollY;
+      const bottom = rect.bottom + window.scrollY;
+      return top <= midY && bottom >= midY;
+    });
+
+    if (!current) {
+      let best = null, bestDist = Infinity;
+      chapters.forEach(ch => {
+        const top = ch.getBoundingClientRect().top + window.scrollY;
+        const dist = Math.abs(top - midY);
+        if (dist < bestDist) { best = ch; bestDist = dist; }
+      });
+      current = best;
+    }
+    return current || null;
+  }
+
+  function getCurrentPageEl(chapterEl) {
+    const chapter = chapterEl || getCurrentChapterEl();
+    if (!chapter) return null;
+    const pages = Array.from(chapter.querySelectorAll('section.page'));
+    if (!pages.length) return null;
+
+    const midY = window.scrollY + window.innerHeight / 2;
+
+    // Página cuyo rectángulo contiene el "centro" del viewport
+    let current = pages.find(sec => {
+      const rect = sec.getBoundingClientRect();
+      const top = rect.top + window.scrollY;
+      const bottom = rect.bottom + window.scrollY;
+      return top <= midY && bottom >= midY;
+    });
+
+    // Fallback: la más cercana al centro
+    if (!current) {
+      let best = null, bestDist = Infinity;
+      pages.forEach(sec => {
+        const top = sec.getBoundingClientRect().top + window.scrollY;
+        const dist = Math.abs(top - midY);
+        if (dist < bestDist) { best = sec; bestDist = dist; }
+      });
+      current = best;
+    }
+    return current || null;
+  }
+
+  // --- Restaurar al cargar (prioriza página; si no, capítulo) ---
+  document.addEventListener('DOMContentLoaded', () => {
+    const hash = location.hash;
+
+    // Si el usuario llega con #cap-x o #page-xx, respetar su intención
+    const landedTarget = hash ? document.querySelector(hash) : null;
+    if (landedTarget && (landedTarget.classList.contains('chapter') || landedTarget.classList.contains('page'))) {
+      return;
+    }
+
+    const savedPageId = localStorage.getItem(LS.page);
+    const savedChapterId = localStorage.getItem(LS.chapter);
+    const savedPage = savedPageId ? document.getElementById(savedPageId) : null;
+    const savedChapter = savedChapterId ? document.getElementById(savedChapterId) : null;
+
+    if (savedPage) {
+      savedPage.scrollIntoView({ behavior: 'auto', block: 'start' });
+      history.replaceState(null, '', `#${savedPage.id}`);
+      return;
+    }
+    if (savedChapter) {
+      savedChapter.scrollIntoView({ behavior: 'auto', block: 'start' });
+      history.replaceState(null, '', `#${savedChapter.id}`);
+    }
+  });
+
+  // --- Guardar al hacer scroll/resize (debounced) ---
+  let saveTimer = null;
+  function scheduleSave() {
+    if (saveTimer) return;
+    saveTimer = setTimeout(() => {
+      saveTimer = null;
+      const ch = getCurrentChapterEl();
+      if (ch && ch.id) {
+        localStorage.setItem(LS.chapter, ch.id);
+        const pg = getCurrentPageEl(ch);
+        if (pg && pg.id) {
+          localStorage.setItem(LS.page, pg.id);
+        }
+      }
+    }, 250);
+  }
+  window.addEventListener('scroll', scheduleSave, { passive: true });
+  window.addEventListener('resize', scheduleSave);
+
+  // --- Guardar al navegar desde el TOC (capítulo o número de página) ---
+  document.addEventListener('click', (ev) => {
+    const a = ev.target.closest('#toc a[href^="#"]');
+    if (!a) return;
+
+    const targetId = a.getAttribute('href').slice(1); // "cap-2" o "page-14"
+    const targetEl = document.getElementById(targetId);
+
+    if (!targetEl) return;
+
+    if (targetEl.classList.contains('chapter')) {
+      // Click en el título del capítulo
+      localStorage.setItem(LS.chapter, targetEl.id);
+      const firstPage = targetEl.querySelector('section.page[id]');
+      if (firstPage) {
+        localStorage.setItem(LS.page, firstPage.id);
+      } else {
+        localStorage.removeItem(LS.page);
+      }
+    } else if (targetEl.classList.contains('page')) {
+      // Click en un número de página
+      const owner = targetEl.closest('article.chapter');
+      if (owner && owner.id) localStorage.setItem(LS.chapter, owner.id);
+      localStorage.setItem(LS.page, targetEl.id);
+    }
+  });
+
+  // --- Guardar al usar el botón de glosario (antes de saltar) ---
+  const glossaryBtn = document.getElementById('glossaryBtn');
+  if (glossaryBtn) {
+    glossaryBtn.addEventListener('click', () => {
+      const ch = getCurrentChapterEl();
+      if (ch && ch.id) {
+        localStorage.setItem(LS.chapter, ch.id);
+        const pg = getCurrentPageEl(ch);
+        if (pg && pg.id) localStorage.setItem(LS.page, pg.id);
+      }
+    });
+  }
+})();
+</script>
+
+
+<script>
+  // --- Toggle del TOC (Índice)
+  (function () {
+    const tocBtn = document.getElementById('tocBtn');
+    const tocSection = document.getElementById('toc');
+    if (!tocBtn || !tocSection) return;
+
+    let isTocMode = false;
+    let lastPositionTOC = null;
+
+    // Si el botón de glosario está activo, lo “apagamos” al entrar en modo TOC
+    function exitGlossaryModeIfNeeded() {
+      try {
+        if (typeof isGlossaryMode !== 'undefined' && isGlossaryMode) {
+          // Imitar la acción “volver” del botón de glosario sin mover el scroll
+          isGlossaryMode = false;
+          const gb = document.getElementById('glossaryBtn');
+          if (gb) gb.textContent = "📘";
+          // Nota: no hacemos scroll aquí para no interferir en el retorno al TOC
+        }
+      } catch (e) { /* no-op si no existe */ }
+    }
+
+    function goToTOC() {
+      exitGlossaryModeIfNeeded();
+      lastPositionTOC = window.scrollY;
+      tocSection.scrollIntoView({ behavior: 'auto', block: 'start' });
+      tocBtn.textContent = '⬅️';
+      tocBtn.setAttribute('aria-label', 'Volver a la lectura');
+      isTocMode = true;
+    }
+
+    function goBackFromTOC() {
+      if (lastPositionTOC != null) {
+        window.scrollTo({ top: lastPositionTOC, behavior: 'auto' });
+      }
+      tocBtn.textContent = '☰';
+      tocBtn.setAttribute('aria-label', 'Ir al índice');
+      isTocMode = false;
+    }
+
+    tocBtn.addEventListener('click', () => {
+      if (!isTocMode) goToTOC();
+      else goBackFromTOC();
+    });
+
+    // Si hacemos clic dentro del Índice (por ejemplo en un capítulo o página),
+    // salimos del modo TOC y devolvemos el icono a ☰.
+    tocSection.addEventListener('click', (ev) => {
+      const a = ev.target.closest('a[href^="#"]');
+      if (!a) return;
+      // Dejamos que el otro script haga scroll suave,
+      // aquí solo reseteamos el estado visual del botón.
+      requestAnimationFrame(() => {
+        tocBtn.textContent = '☰';
+        tocBtn.setAttribute('aria-label', 'Ir al índice');
+        isTocMode = false;
+      });
+    });
+  })();
+</script>
 
 </body>
 </html>
