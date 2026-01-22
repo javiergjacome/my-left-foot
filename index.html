@@ -17,19 +17,19 @@
     p{margin:10px 0}
     strong{font-weight:700}
     footer{color:#666;font-size:.9rem;margin-top:18px}
-    #glossary dl {
+    .glossary dl {
   display: grid;
   grid-template-columns: 220px 1fr;
   row-gap: 8px;
   column-gap: 16px;
 }
 
-#glossary dt {
+.glossary dt {
   font-weight: 600;
   margin: 0;
 }
 
-#glossary dd {
+.glossary dd {
   margin: 0;
 }
     #glossaryBtn {
@@ -53,10 +53,61 @@
 }
 
 /* Highlight for matched glossary term */
-#glossary dt.glossary-hit {
+.glossary dt.glossary-hit {
   background: #fff3b0;
   border-radius: 8px;
   padding: 2px 6px;
+}
+
+
+/* ----- Índice (TOC) ----- */
+#toc {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 14px;
+  margin-top: 12px;
+  box-shadow: 0 1px 2px rgba(0,0,0,.04);
+}
+#toc h2 {
+  font-size: 1.15rem;
+  margin: 0 0 8px;
+}
+#toc ol {
+  margin: 0;
+  padding-left: 20px;
+}
+#toc li {
+  margin: 4px 0;
+}
+#toc a {
+  color: #0b5bd3;
+  text-decoration: none;
+  transition: color .15s ease;
+}
+#toc a:hover {
+  text-decoration: underline;
+}
+/* Estado activo (capítulo visible) */
+#toc a.active {
+  color: #0a3f8f;
+  font-weight: 600;
+  position: relative;
+}
+#toc a.active::before {
+  content: "•";
+  color: #0a3f8f;
+  margin-right: 6px;
+}
+
+/* Contenedor del capítulo (decorativo) */
+.chapter {
+  margin-top: 16px;
+}
+.chapter-title {
+  font-size: 1.2rem;
+  margin: 0 0 8px;
+  color: #333;
 }
 
 /* --- Mobile fixes --- */
@@ -70,15 +121,15 @@
   }
 
   /* 2) Glossary: use full width and stack definition under the term */
-  #glossary dl {
+  .glossary dl {
     display: block;          /* override grid */
   }
 
-  #glossary dt {
+  .glossary dt {
     margin-top: 12px;
   }
 
-  #glossary dd {
+  .glossary dd {
     margin: 4px 0 0 0;       /* definition right after the term */
   }
 }
@@ -92,7 +143,15 @@
       <h1>My Left Foot</h1>
       <p class="meta">by Christy Brown</p>
       <h2>CHAPTER 1 — THE LETTER “A”</h2>
+		<nav id="toc">
+		  <h2>Índice</h2>
+		  <ol id="toc-list"></ol>
+		</nav>
     </header>
+
+
+<article id="cap-1" class="chapter">
+  <h2 class="chapter-title">CHAPTER 1 — THE LETTER “A”</h2>
 
     <section class="page" id="page-7">
       <div class="pagenum">Página 7</div>
@@ -180,7 +239,7 @@
       <p>I had done it! It had started — the thing that was to give my mind its opportunity to express itself. True, I couldn’t speak with my lips, but now I would speak through something more lasting than spoken words — written words.</p>
     </section>
 
-    <section id="glossary">
+    <section class="glossary" id="glossary-cap-1">
   <h2>Glossary – Chapter 1</h2>
   <p class="meta">Vocabulary support for Spanish students (3º ESO)</p>
 
@@ -283,6 +342,83 @@
 
   </dl>
 </section>
+</article>
+
+
+<article id="cap-2" class="chapter">
+  <h2 class="chapter-title">CHAPTER 2 — M-O-T-H-E-R</h2>
+
+  <!-- Página 13 -->
+  <section class="page" id="page-13">
+    <div class="pagenum">Página 13</div>
+    <p>Having taught me to draw the letter “A” with my foot, mother next started to teach me the whole alphabet in much the same way. She was determined to help me communicate through the written word, if the spoken word was impossible.</p>
+    <p>My memory of the way she did this is quite clear. She would write down each letter on the slate with a piece of chalk. Then she would rub them out with a duster and make me write them down again from memory with the chalk held between my toes.</p>
+  </section>
+
+  <!-- Página 14 -->
+  <section class="page" id="page-14">
+    <div class="pagenum">Página 14</div>
+    <p>I remember the first thing I learned to write was my initials, “C.B.”, though I often became confused and put the “B” before the “C”. Whenever anyone asked me what my name was, I took a piece of chalk and wrote “C.B.” with a great flourish.</p>
+    <p>Soon afterwards, I learned to write my full name instead of just two initials. I was tremendously proud of myself when I could do this. I felt quite important.</p>
+    <p>I was now nearly six, and soon I got tired of just writing my own name. I wanted to do something else — something bigger. But I couldn’t, because I couldn’t read. I didn’t exactly know what being able to read was. I just knew that my brothers Jim, Tony and Peter could do it, that Mona could do it, and that made me want to do it too. I think I was jealous.</p>
+    <p>Slowly, very painfully, I went through the whole twenty-six letters with my mother and gradually mastered each of them in turn. One thing that gave mother great encouragement at this time was my ability to listen and watch attentively when she was sitting by my side giving me lessons.</p>
+    <p>Knowing the alphabet was half the battle won, for I was soon able to put letters together and to form little words. After a while, I began to know how to put words together and form sentences. I was getting on. But it wasn’t as easy or as simple as it sounds. Mother had many other children to care for.</p>
+    <p>Fortunately she had a good helper in my sister Lily. She was the eldest and the little mother of the group, a small, wiry kid with flowing black curls and flashing eyes. She busied herself looking after the others so that mother could spend more time with me. She cooked, she washed and dressed the smaller ones and she made sure the bigger ones washed behind their ears every morning before leaving for school.</p>
+    <p>I still could not speak intelligibly, but by now I had a strange sort of language which the family understood more or less. Whenever I got into difficulties and they couldn’t understand what I was saying, I’d point to the slate and print the words out on it with my left foot.</p>
+  </section>
+
+  <!-- Página 15 -->
+  <section class="page" id="page-15">
+    <div class="pagenum">Página 15</div>
+    <p>If I couldn’t spell the words I wanted to write I got very angry, which only made me grunt still more incoherently.</p>
+    <p>Although I couldn’t talk very much at seven years old, I was now able to sit up alone and crawl about from place to place on my bottom without breaking any bones or smashing any of mother’s china. I wore no shoes or any other kind of footwear. My mother had tried to make me used to having my feet covered from an early age, saying I looked very much neglected barefooted. But whenever she put shoes or stockings on my feet, I felt as any normal person might feel if his hands were tied behind his back.</p>
+    <p>As time went on, I began to depend more and more on my left foot for everything. It was my main means of communication, of making myself understood to the family. Very slowly it became indispensable to me. With it, I learned to break down some of the barriers that stood between me and my family. It was the only key to the door of the prison I was in.</p>
+    <p>Meanwhile the family was multiplying steadily, and I was growing. My body was expanding and becoming bigger, and my mind was too. Mother found I had already passed beyond the ABC stage and almost beyond her teaching capability. I wasn’t satisfied any more just to sit and listen while mother read aloud to me. I was restless to be able to read myself, like Peter or Mona.</p>
+    <p>My mother knew it was impossible for me to go to school like the others. She feared very much that I would grow up to be illiterate and therefore at a great disadvantage intellectually as well as physically. This fear tormented her almost continually. It wasn’t because of any sense of shame at having an illiterate as well as a crippled son. She thought only of the handicap it would be to me when I got older. She wanted above all to make me equal with my sisters and brothers in every way possible. But she hadn’t much time or chance to do this daily, for she was…</p>
+  </section>
+
+  <!-- Página 16 -->
+  <section class="page" id="page-16">
+    <div class="pagenum">Página 16</div>
+    <p>…busy fighting to carry us all through times of unemployment, illnesses and many other worries. She found it difficult to smile at times, though she always managed to do so.</p>
+    <p>When mother was busy, I worked by myself. I learned to write with a pencil. I used to try and spell out the names of the objects around me at home, like fire, picture, dog, door, chair and so on. I was very proud of myself when I had mastered a new word and could write it down for mother to show her what a great student I was.</p>
+    <p>One day I had been trying particularly hard to master a new word that I had found in Peter’s schoolbook. At last I understood it and turned to mother, who was sitting on a chair by the fire looking after my baby brother. Many times that day I had looked over to where mother sat because I couldn’t understand this word by myself. But, seeing her rocking gently in the chair, holding the baby closely against her breast, I had turned my face away again, feeling that I must work out this one word for myself without my mother’s help.</p>
+    <p>A few minutes later, I gave a big shout of triumph that made mother jump and the baby move uneasily in her arms. “What is it, Chris?” she asked me. “You’ll wake the baby.” But I didn’t care. In my own queer, grunting way I told her to come to me at once. “A new word, is it?” she said as she came across and sat down on the edge of the sofa, the baby asleep in her arms. I grinned and, taking up the pencil, wrote down the word which had puzzled me for so long. When it was done, I looked at her for her approval, and saw she was staring silently at what I had written on the page. She remained so still and thoughtful for so long that I became anxious and pushed her with my foot. She turned, placed her hand on me and smiled. The new word which I had learned to write for the first time was <strong>M–O–T–H–E–R</strong>.</p>
+  </section>
+
+  <!-- Glosario del capítulo 2 -->
+  <section class="glossary" id="glossary-cap-2">
+    <h2>Glossary – Chapter 2</h2>
+    <p class="meta">Vocabulary support for Spanish students (3º ESO)</p>
+    <dl>
+      <dt><strong>alphabet</strong></dt><dd>alfabeto</dd>
+      <dt><strong>slate</strong></dt><dd>pizarra (de tiza)</dd>
+      <dt><strong>duster</strong></dt><dd>borrador (para pizarra)</dd>
+      <dt><strong>initials</strong></dt><dd>iniciales (p. ej., “C.B.”)</dd>
+      <dt><strong>flourish</strong></dt><dd>floritura; trazo adornado</dd>
+      <dt><strong>proud</strong></dt><dd>orgulloso</dd>
+      <dt><strong>jealous</strong></dt><dd>celoso</dd>
+      <dt><strong>attentively</strong></dt><dd>atentamente</dd>
+      <dt><strong>master (a skill/word)</strong></dt><dd>dominar (una destreza/palabra)</dd>
+      <dt><strong>sentences</strong></dt><dd>frases; oraciones</dd>
+      <dt><strong>intelligibly</strong></dt><dd>de forma inteligible (que se entiende)</dd>
+      <dt><strong>incoherently</strong></dt><dd>de forma incoherente</dd>
+      <dt><strong>crawl</strong></dt><dd>arrastrarse; desplazarse a ras del suelo</dd>
+      <dt><strong>footwear</strong></dt><dd>calzado</dd>
+      <dt><strong>barefoot(ed)</strong></dt><dd>descalzo</dd>
+      <dt><strong>indispensable</strong></dt><dd>imprescindible; indispensable</dd>
+      <dt><strong>barrier</strong></dt><dd>barrera; obstáculo</dd>
+      <dt><strong>illiterate</strong></dt><dd>analfabeto (término sensible; contexto educativo)</dd>
+      <dt><strong>disadvantage</strong></dt><dd>desventaja</dd>
+      <dt><strong>handicap</strong></dt><dd>discapacidad/handicap (término desaconsejado hoy)</dd>
+      <dt><strong>restless</strong></dt><dd>inquieto</dd>
+      <dt><strong>unemployment</strong></dt><dd>desempleo</dd>
+      <dt><strong>puzzled</strong></dt><dd>desconcertado; confundido</dd>
+      <dt><strong>breast (maternal context)</strong></dt><dd>pecho (materno)</dd>
+      <dt><strong>triumph</strong></dt><dd>triunfo</dd>
+    </dl>
+  </section>
+</article>
 
   </main>
   
@@ -291,13 +427,14 @@
   📘
 </button>
 
+
 <script>
-  let lastPosition = null;
-  let isGlossaryMode = false; // false = 📘 (ir), true = ⬅️ (volver)
-
+  // --- Estado por capítulo ---
   const glossaryBtn = document.getElementById("glossaryBtn");
-  const glossarySection = document.getElementById("glossary");
+  let isGlossaryMode = false; // false = 📘 (ir), true = ⬅️ (volver)
+  const lastPositionByChapter = new Map(); // capId -> scrollY
 
+  // --- Utilidades existentes (adaptadas) ---
   function normalizeTerm(s) {
     return (s || "")
       .toLowerCase()
@@ -305,23 +442,53 @@
       .replace(/[“”"'.:,;!?()]/g, "")
       .replace(/\s+/g, " ");
   }
-
-  function clearHits() {
-    document.querySelectorAll("#glossary dt.glossary-hit")
-      .forEach(el => el.classList.remove("glossary-hit"));
-  }
-
   function getSelectedWord() {
-    const sel = window.getSelection();
+    const sel = window.getSelection && window.getSelection();
     if (!sel || sel.isCollapsed) return "";
     return sel.toString().trim();
   }
 
-  function findGlossaryMatch(query) {
-    const q = normalizeTerm(query);
-    if (!q) return null;
+  // --- Detección de capítulo/glosario actual ---
+  function getCurrentChapter() {
+    const chapters = Array.from(document.querySelectorAll("article.chapter"));
+    if (!chapters.length) return null;
+    const midY = window.scrollY + window.innerHeight / 2;
 
-    const dts = Array.from(document.querySelectorAll("#glossary dt"));
+    // Capítulo cuyo rectángulo contiene el centro de la vista
+    let current = chapters.find(ch => {
+      const rect = ch.getBoundingClientRect();
+      const top = rect.top + window.scrollY;
+      const bottom = rect.bottom + window.scrollY;
+      return top <= midY && bottom >= midY;
+    });
+
+    // Fallback: el más cercano por top
+    if (!current) {
+      let best = null, bestDist = Infinity;
+      chapters.forEach(ch => {
+        const top = ch.getBoundingClientRect().top + window.scrollY;
+        const dist = Math.abs(top - midY);
+        if (dist < bestDist) { best = ch; bestDist = dist; }
+      });
+      current = best;
+    }
+    return current || null;
+  }
+
+  function getGlossaryForChapter(chapterEl) {
+    return chapterEl ? chapterEl.querySelector(".glossary") : null;
+  }
+
+  function clearHits(glossaryRoot) {
+    const scope = glossaryRoot || document;
+    scope.querySelectorAll("dt.glossary-hit")
+      .forEach(el => el.classList.remove("glossary-hit"));
+  }
+
+  function findGlossaryMatch(query, glossaryRoot) {
+    const q = normalizeTerm(query);
+    if (!q || !glossaryRoot) return null;
+    const dts = Array.from(glossaryRoot.querySelectorAll("dt"));
 
     // exacta
     let hit = dts.find(dt => normalizeTerm(dt.textContent) === q);
@@ -336,46 +503,137 @@
     return hit || null;
   }
 
-  function goToGlossary() {
-    lastPosition = window.scrollY;
-    glossarySection.scrollIntoView({ behavior: "smooth" });
+  // --- Navegación del botón ---
+  function goToGlossaryOfCurrentChapter() {
+    const chapter = getCurrentChapter();
+    const glossary = getGlossaryForChapter(chapter);
+    if (!chapter || !glossary) return;
+
+    lastPositionByChapter.set(chapter.id, window.scrollY);
+    glossary.scrollIntoView({ behavior: "smooth" });
     glossaryBtn.textContent = "⬅️";
     isGlossaryMode = true;
   }
 
-  function goBack() {
-    clearHits();
-    if (lastPosition !== null) {
-      window.scrollTo({ top: lastPosition, behavior: "smooth" });
+  function goBackFromGlossary() {
+    const chapter = getCurrentChapter();
+    const glossary = getGlossaryForChapter(chapter);
+
+    if (glossary) clearHits(glossary);
+
+    const key = chapter ? chapter.id : null;
+    const pos = key ? lastPositionByChapter.get(key) : null;
+    if (pos != null) {
+      window.scrollTo({ top: pos, behavior: "smooth" });
     }
     glossaryBtn.textContent = "📘";
     isGlossaryMode = false;
   }
 
+  // --- Click del botón ---
   glossaryBtn.addEventListener("click", () => {
+    const chapter = getCurrentChapter();
+    const glossary = getGlossaryForChapter(chapter);
+    if (!chapter || !glossary) return;
+
     const selected = getSelectedWord();
 
-    // 1) Si hay selección: siempre ir al glosario y buscar (sin alternar a "ir")
+    // 1) Si hay selección: ir al glosario del capítulo actual y buscar ahí
     if (selected) {
-      goToGlossary();
-
+      goToGlossaryOfCurrentChapter();
       setTimeout(() => {
-        clearHits();
-        const match = findGlossaryMatch(selected);
+        clearHits(glossary);
+        const match = findGlossaryMatch(selected, glossary);
         if (match) {
           match.classList.add("glossary-hit");
           match.scrollIntoView({ behavior: "smooth", block: "center" });
         }
       }, 250);
-
       return;
     }
 
-    // 2) Si NO hay selección: TOGGLE puro
+    // 2) Si NO hay selección: alternar ir/volver dentro del capítulo actual
     if (!isGlossaryMode) {
-      goToGlossary();
+      goToGlossaryOfCurrentChapter();
     } else {
-      goBack();
+      goBackFromGlossary();
+    }
+  });
+</script>
+
+<script>
+  // Construye el índice automáticamente y activa resaltado por scroll (scroll-spy)
+  document.addEventListener("DOMContentLoaded", () => {
+    const tocList = document.getElementById("toc-list");
+    if (!tocList) return;
+
+    // 1) Recolectar capítulos
+    const chapters = Array.from(document.querySelectorAll("article.chapter"));
+    const items = [];
+
+    chapters.forEach((chapter) => {
+      const id = chapter.id || "";
+      const titleEl = chapter.querySelector(".chapter-title");
+      const title = titleEl ? titleEl.textContent.trim() : id || "Capítulo";
+
+      // Crear <li><a href="#cap-x">Título…</a></li>
+      const li = document.createElement("li");
+      const a = document.createElement("a");
+      a.href = `#${id}`;
+      a.textContent = title;
+
+      // Scroll suave al hacer clic
+      a.addEventListener("click", (ev) => {
+        ev.preventDefault();
+        chapter.scrollIntoView({ behavior: "smooth", block: "start" });
+        // actualizar hash sin salto brusco
+        history.pushState(null, "", `#${id}`);
+      });
+
+      li.appendChild(a);
+      tocList.appendChild(li);
+      items.push({ chapter, a });
+    });
+
+    // 2) Resaltado del capítulo visible usando IntersectionObserver
+    const observer = new IntersectionObserver((entries) => {
+      // buscamos el capítulo con mayor intersección
+      let best = null;
+      let bestRatio = 0;
+
+      entries.forEach((entry) => {
+        if (entry.isIntersecting && entry.intersectionRatio > bestRatio) {
+          best = entry.target;
+          bestRatio = entry.intersectionRatio;
+        }
+      });
+
+      if (best) {
+        // limpiar activos
+        items.forEach(({ a }) => a.classList.remove("active"));
+        // marcar activo
+        const found = items.find(({ chapter }) => chapter === best);
+        if (found) found.a.classList.add("active");
+      }
+    }, {
+      root: null,
+      // Consideramos visible “de verdad” cuando ~40% del capítulo está a la vista
+      threshold: [0.4, 0.6, 0.8]
+    });
+
+    chapters.forEach(ch => observer.observe(ch));
+
+    // 3) Si llegamos con hash en URL (#cap-x), activar ese activo de inicio
+    if (location.hash) {
+      const target = document.querySelector(location.hash);
+      if (target && target.classList.contains("chapter")) {
+        // Marcarlo “a mano” al principio
+        items.forEach(({ a }) => {
+          a.classList.toggle("active", a.getAttribute("href") === location.hash);
+        });
+        // Opcional: scroll suave si quieres
+        // target.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
     }
   });
 </script>
